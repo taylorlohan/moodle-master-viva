@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MediaCapture and Streams API</title>
+    <meta name="viewport" content="width=device-width">
+    <style type="text/css">
+        [data-role="recordings"] > .row > a {
+            display: inline-block;
+            text-align: center;
+            font-size: 20px;
+            line-height: 50px;
+            vertical-align: middle;
+            width: 50px;
+            height: 50px;
+            border-radius: 20px;
+            color: #fff;
+            font-weight: bold;
+            text-decoration: underline;
+            background-color: #0093E9;
+            background-image: -webkit-gradient(linear, left bottom, left top, from(#0093E9), to(#80D0C7));
+            background-image: -o-linear-gradient(bottom, #0093E9 0%, #80D0C7 100%);
+            background-image: linear-gradient(0deg, #0093E9 0%, #80D0C7 100%);
+            float: right;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+
+      .button-style {
+            display: inline-block;
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font: 14px/100% Arial, Helvetica, sans-serif;
+            padding: .5em 2em .55em;
+            text-shadow: 0 1px 1px rgba(0,0,0,.3);
+            -webkit-border-radius: .5em;
+            -moz-border-radius: .5em;
+            border-radius: .5em;
+            -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+            -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+            box-shadow: 0 1px 2px rgba(0,0,0,.2);
+
+        }
+
+        /*.bar {
+            width: 320px;
+            height: 50px;
+            margin: 1px;
+            display: inline-block;
+            position: relative;
+            background-color: #aeaeae;
+            vertical-align: baseline;
+            text-align: center;
+            border-radius: 20px;
+        }*/
+
+        </style>
+</head>
+<body>
+<header>
+    <h1>Online Viva</h1>
+
+</header>
+
+    <!-- <video controls id="vidcon"></video> -->
+<script type="text/javascript" src="https://code.jquery.com/jquery.min.js"></script>
+<script src="amd/src/functions.js"></script>
+
+<div class="holder">
+
+        <canvas id="canvas">
+        </canvas>
+
+        <div class="output">
+            <img id="photo" alt="The screen capture will appear in this box.">
+        </div>
+    <video id="vidcon" data-role="recordings">Video stream not available.</video>
+    <div data-role="controls">
+        <p><button id="btnstart" class="button-style">START RECORDING</button><br/>
+            <button id="btnstop" class="button-style">STOP RECORDING</button></p>
+    </div>
+
+    <div data-role="recordings">
+    <div class="row">
+        <audio id="aud" controls></audio>
+        <a>&#9660;</a>
+    </div>
+    </div>
+
+</div>
+</body>
+</html>
