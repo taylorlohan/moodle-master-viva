@@ -36,6 +36,6 @@ $obj->maxquestion = $maxquestion;
 $PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('assignsubmission_onlineviva/show', $obj);
+echo $OUTPUT->render_from_template('assignsubmission_onlineviva/testCameraCanvas', $obj);
 
 echo $OUTPUT->footer();
