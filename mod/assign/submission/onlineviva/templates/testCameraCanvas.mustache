@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>MediaRecorder使用示例</title>
+</head>
+<style>
+    canvas {
+        box-shadow: 0 0 10px gray;
+        display: block;
+    }
+</style>
+<h3 style="text-align: center;margin-top:10px;">Viva</h3>
+<p style="text-align: center;margin-top:10px;color:grey">Answer the following questions according to your coursework</p>
+<div style="text-align: center;margin-top:10px;">
+    <canvas id="canvas" height=460 width=640 style="width:640px;margin:auto;"></canvas>
+    <video src="" id="srcvideo" style="display:none;"></video>
+    <p class="count"></p>
+</div>
+<div style="text-align: center;margin-top:10px;">
+    <button id="startBtn" disabled>开始录制</button>
+    <button id="stopBtn" disabled>结束录制</button>
+</div>
+<div style="text-align: center;margin-top:20px;">
+    <p>Questions for viva</p>
+    <!--
+    <p><input type="radio" name="format" value="video/webm;codecs=vp8" onclick="setFormatSelect('video/webm;codecs=vp8')">video/webm;codecs=vp8</p>
+     -->
+</div>
+<div style="margin-top:50px;text-align: center;font-size:14px;">view source: <a href="https://github.com/wendychengc/media-recorder-video-canvas/tree/master" target="_blank">https://github.com/wendychengc/media-recorder-video-canvas/tree/master</a></div>
+
+
+<script>
+    var allChunks = [];
+    let c=15;
+    init();
+
+    function init() {
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        navigator.mediaDevices.getUserMedia({
+            audio:true,
+            video: true
+        })
+                .then(function(mediaStream) {
+                    var srcvideo = document.getElementById("srcvideo")
+                    srcvideo.srcObject = mediaStream;
+                    srcvideo.play()
+                    playCanvas(srcvideo, ctx)
+                })
+
+        setRecorder();
+        setFormatSelect('video/webm;codecs=vp9')//找到合适的音频格式并导入数据库
+    }
+
+    function playCanvas(srcvideo, ctx) {
+        ctx.drawImage(srcvideo, 0, 0, 640, 460)
+        requestAnimationFrame(() => {
+            playCanvas(srcvideo, ctx)
+        })
+    }
+
+    function setFormatSelect(format){
+        if(!MediaRecorder.isTypeSupported(format)){
+            alert(format)
+            alert("当前浏览器不支持该编码类型");//最后可以去掉
+            return;
+        }
+        //console.log(MediaRecorder.ty)
+        allChunks = [];
+        setRecorder(format)
+    }
+
+    //处理数据库
+    function saveAudio() {
+
+    }
+
+    function setRecorder(format) {
+        const stream = canvas.captureStream(60); // 60 FPS recording
+        const audioTracks = stream.getAudioTracks();
+        const recorder = new MediaRecorder(stream, {
+            mimeType: format
+        });
+        recorder.ondataavailable = e => {
+            allChunks.push(
+                    e.data
+            );
+        }
+
+        startBtn.disabled = false;
+        startBtn.onclick = e => {
+            recorder.start(10);
+            timedCount();
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+        }
+        stopBtn.onclick = e => {
+            recorder.stop();
+            console.log('recorder has stopped')
+            saveAudio(audioTracks);
+            //blobDownload(format);
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+
+
+    }
+    function timedCount() {
+        document.querySelector(".count").innerHTML = 'time left is' + c;
+        c = c - 1;
+        if (c > 0) {
+            let t = setTimeout(timedCount, 1000);
+        } else {
+                //recorder.stop();
+                document.querySelector(".count").innerHTML = "Time is up!";
+                stopBtn.click()
+                console.log('stop is clicked')
+                return;
+
+            //else console.log('recorder is null');
+        }
+    }
+    function blobDownload(format) {
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        const fullBlob = new Blob(allChunks);
+        const downloadUrl = window.URL.createObjectURL(fullBlob);
+        link.href = downloadUrl;
+        link.download = 'media - '+format+'.mp3';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+</script>

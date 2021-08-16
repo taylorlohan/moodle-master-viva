@@ -1,105 +1,101 @@
 window.onload=function (){
-    let constraintObj = {
+    /*let constraintObj = {
         audio: true,
         video: {
             facingMode: "user",
             width: { min: 640, ideal: 1280, max: 1920 },
             height: { min: 480, ideal: 720, max: 1080 }
         }
-    };
+    };*/
 //startRecording();
-    var canvas=$('#canvas');
+    var canvas=document.getElementById('canvas');
+    let chunks = [];
     var width = 320;
     var height = 0;
     let c = 10;
-    let recorder;
+    //let recorder;
     //let t;
     let photo = document.getElementById('photo');
-    var recordmethods = {
-        //let recorder = null;
-        startRecording: function () {
-            if (navigator.mediaDevices === undefined) {
-                navigator.mediaDevices = {};
-                navigator.mediaDevices.getUserMedia = function (constraintObj) {
-                    let getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-                    if (!getUserMedia) {
-                        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-                    }
-                    return new Promise(function (resolve, reject) {
-                        getUserMedia.call(navigator, constraintObj, resolve, reject);
-                    });
-                }
-            } else {
-                navigator.mediaDevices.enumerateDevices()
-                    .then(devices => {
-                        devices.forEach(device => {
-                            console.log(device.kind.toUpperCase(), device.label);
-                            //, device.deviceId
-                        })
-                    })
-                    .catch(err => {
-                        console.log(err.name, err.message);
-                    })
-            }
+    var options = {audio: true, video: {
+            facingMode: "user",
+            width: { min: 640, ideal: 1280, max: 1280 },
+            height: { min: 480, ideal: 720, max: 720 }
+        }};
+    init();
 
-            navigator.mediaDevices.getUserMedia(constraintObj)
-                .then(function (mediaStreamObj) {
-                    //connect the media stream to the first video element
-                    recorder = new MediaRecorder(mediaStreamObj);
-                    let video = document.querySelector('video');
-                    if ("srcObject" in video) {
-                        video.srcObject = mediaStreamObj;
-                    } else {
-                        //old version
-                        video.src = window.URL.createObjectURL(mediaStreamObj);
-                    }
-                    timedCount();
-                    console.log(c);
-                    video.onloadedmetadata = function (ev) {
-                        //show in the video element what is being captured by the webcam
-                        video.play();
-                        //timedCount();
-                    };
-                    recorder.onstart=function (ev) {
-                        timedPic();
-                    };
-                    recorder.ondataavailable = function (ev) {
-                        chunks.push(ev.data);
-                    };
-                    stop.addEventListener('click', (ev)=>{
-                        recorder.stop();
-                    });
+    function init() {
+        // eslint-disable-next-line no-undef
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    recorder.onstop=function (ev) {
-                        let blob = new Blob(chunks, {'type': 'audio/wav;'});
-                        chunks = [];
-                        let audioURL = window.URL.createObjectURL(blob);
-                        audio.src = audioURL;
-                    };
+        navigator.mediaDevices.getUserMedia(options)
+            .then(function(mediaStream) {
+                var srcvideo = document.getElementById("srcvideo")
+                srcvideo.srcObject = mediaStream;
+                srcvideo.play();
+                //playCanvas(srcvideo, ctx)
+            });
 
+        setRecorder();
+        setFormatSelect('video/webm;codecs=vp9');
+    }
 
-
-                })
-                .catch(function (err) {
-                    console.log(err.name, err.message);
-                });
-        },
-    };
-
-
-    let start = document.getElementById('btnstart');
-    let stop = document.getElementById('btnstart');
     let audio = document.getElementById('aud');
 //let mediaRecorder = new MediaRecorder(mediaStreamObj);
-    let chunks = [];
 
 
-    start.addEventListener('click', (ev)=>{
-        //console.log(start);
-        recordmethods.startRecording();
-        console.log('recorder starts now');
-    });
-    function timedCount() {
+    function setFormatSelect(format){
+        if(!MediaRecorder.isTypeSupported(format)){
+            alert(format);
+            alert("当前浏览器不支持该编码类型");
+            return;
+        }
+        chunks = [];
+        setRecorder(format);
+    }
+
+    function setRecorder(format) {
+        let start = document.getElementById('btnstart');
+        let stop = document.getElementById('btnstart');
+        const stream = canvas.captureStream(60); // 60 FPS recording
+        const recorder = new MediaRecorder(stream, {
+            mimeType: format
+        });
+        recorder.ondataavailable = e => {
+            chunks.push(
+                e.data
+            );
+        };
+
+        start.disabled = false;
+        start.onclick = e => {
+            recorder.start(10);
+            start.disabled = true;
+            stop.disabled = false;
+        };
+        stop.onclick = e => {
+            recorder.stop();
+            blobDownload(format);
+            start.disabled = false;
+            stop.disabled = true;
+        };
+
+
+    }
+
+    function blobDownload(format) {
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        const fullBlob = new Blob(chunks);
+        const downloadUrl = window.URL.createObjectURL(fullBlob);
+        link.href = downloadUrl;
+        link.download = 'media - '+format+'.mp4';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+    /*function timedCount() {
         document.querySelector(".count").innerHTML ='time left is'+ c;
         c = c - 1;
         if(c>0){
@@ -149,8 +145,8 @@ window.onload=function (){
         var data = canvas.toDataURL('image/png');
         photo.setAttribute('src', data);
     }
+*/
 
 
 
-
-}
+};

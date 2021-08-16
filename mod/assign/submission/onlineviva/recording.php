@@ -33,7 +33,7 @@ $obj->timelimit = $timelimit;
 $obj->chancelimit = $chancelimit;
 $obj->maxquestion = $maxquestion;
 //$PAGE->requires->js_call_amd('/mod/assign/submission/onlineviva/amd/src/functions.js', 'init', array($obj));
-$PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
+//$PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('assignsubmission_onlineviva/testCameraCanvas', $obj);
