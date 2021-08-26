@@ -24,7 +24,8 @@ $PAGE->set_url('/mod/assign/submission/onlineviva/recording.php');
 
 require_login();
 
-$timelimit = optional_param('timelimit', '', PARAM_INT);
+$timelimit = optional_param('timelimit', '',PARAM_INT);
+//$timelimit = (isset($_FILES['timelimit'])) ? $_FILES['timelimit'] : 'timelimit not found';
 $chancelimit = optional_param('chancelimit', '', PARAM_INT);
 $maxquestion = optional_param('maxquestion', '', PARAM_INT);
 
@@ -36,6 +37,6 @@ $obj->maxquestion = $maxquestion;
 //$PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('assignsubmission_onlineviva/testCameraCanvas', $obj);
+echo $OUTPUT->render_from_template('assignsubmission_onlineviva/recording', $obj);
 
 echo $OUTPUT->footer();

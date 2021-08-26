@@ -9,6 +9,7 @@
  */
 $string['onlineviva']='online viva';
 $string['default_help']='this plugin helps you to do the online viva';
+$string['default'] = 'default setting';
 $string['timelimit']='Recording time';
 $string['chancelimit']='Attempt chance limit';
 $string['maxquestion']='questions in total';
@@ -17,6 +18,12 @@ $string['check']='Check the submitted viva';
 $string['startviva']='Press to start the viva';
 $string['pluginname'] = 'Online viva submissions';
 $string['chosenquestion'] = 'Number of questions chosen';
+$string['maxquestion_add'] = 'Add questions';
+$string['Addquestions']='Adding questions';
+
+
+
+
 
 
 

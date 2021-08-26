@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>MediaRecorder使用示例</title>
+    <title>Starting Viva</title>
 </head>
 <style>
     canvas {
@@ -33,7 +33,7 @@
 
 <script>
     var allChunks = [];
-    let c=15;
+    let c=10;
     init();
 
     function init() {
@@ -77,11 +77,42 @@
     //处理数据库
     function saveAudio() {
 
+        const fullBlob = new Blob(allChunks);
+        const uploadUrl = window.URL.createObjectURL(fullBlob);
+        var myFormData = new FormData();
+        myFormData.append('audio',fullBlob);
+                $.ajax({
+                    type: "POST",
+                    url: 'upload.php',
+                    data : myFormData/*{
+                        //action : 'my_action',
+                        audio_data : myFormData
+                    }*/,
+                    contentType: false,
+                    processData: false,
+                    success: function(data)
+                    {
+                        alert("pass audio to php success!");
+                        console.log(data);
+                    }
+                });
+//试试这段代码
+        /*var xhr=new XMLHttpRequest();
+        xhr.onload=function(e) {
+          if(this.readyState === 4) {
+              console.log("Server returned: ",e.target.responseText);
+          }
+      };
+      var fd=new FormData();
+      fd.append("audio_data",fullBlob, "audio.wav");
+      xhr.open("POST","upload.php",true);
+      xhr.send(fd);*/
+//用Ajax打开一个upload.php页面，使用post传入allchunk参数，再做数据库操作
     }
 
     function setRecorder(format) {
         const stream = canvas.captureStream(60); // 60 FPS recording
-        const audioTracks = stream.getAudioTracks();
+        const audioTracks = stream.getAudioTracks();//怎么只得到音频
         const recorder = new MediaRecorder(stream, {
             mimeType: format
         });
@@ -101,7 +132,7 @@
         stopBtn.onclick = e => {
             recorder.stop();
             console.log('recorder has stopped')
-            saveAudio(audioTracks);
+            saveAudio();
             //blobDownload(format);
             startBtn.disabled = false;
             stopBtn.disabled = true;

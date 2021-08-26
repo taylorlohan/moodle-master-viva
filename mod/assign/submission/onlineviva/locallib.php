@@ -41,9 +41,10 @@ class assign_submission_onlineviva extends assign_submission_plugin
     public function get_settings(MoodleQuickForm $mform)
     {
         global $CFG, $COURSE;
+        $assignmentid=$this->assignment->get_instance()->id;
+
         $timelimit = $this->get_config('timelimit');
         $chancelimit = $this->get_config('chancelimit');
-        //safe save有没有再看
         $maxquestion = $this->get_config('maxquestion');
         $chosenquestion = $this->get_config('chosenquestion');
 
@@ -64,9 +65,26 @@ class assign_submission_onlineviva extends assign_submission_plugin
             'assignsubmission_onlineviva_enabled',
             'notchecked');
 
-        //问题数量
+
+        $name = get_string('maxquestion', 'assignsubmission_onlineviva');
+        $nums=array("assignmentid"=> $assignmentid,
+                     );
+
+
+        //添加问题页面按钮
+        $url=new moodle_url('../mod/assign/submission/onlineviva/addQuestions.php', $nums);
+        $ds= \html_writer::tag('button',
+            get_string('maxquestion_add','assignsubmission_onlineviva'),
+            array('type'=>'button','id'=>'addQuestionbtn','onclick'=>"window.open('{$url}' );"));
+
         $attributes = array('size' => '20');//size设置正确吗？
-        $mform->addElement('text', 'assignsubmission_onlineviva_maxquestion', get_string('maxquestion', 'assignsubmission_onlineviva'), $attributes);
+        $maxquestiongrp = array();
+        $maxquestiongrp[] = $mform->createElement('text', 'assignsubmission_onlineviva_maxquestion', get_string('maxquestion', 'assignsubmission_onlineviva'), $attributes);
+        $maxquestiongrp[] = $mform->createElement('static','addQuestionbtn',
+            get_string('maxquestion_add','assignsubmission_onlineviva'),$ds);
+        //$maxquestiongrp[] = $mform->createElement('button', 'add questions', get_string('maxquestion_add', 'assignsubmission_onlineviva'));
+        $mform->addGroup($maxquestiongrp, 'assignsubmission_onlineviva_question_group', $name, ' ', false);
+        //$mform->addElement('text', 'assignsubmission_onlineviva_maxquestion', get_string('maxquestion', 'assignsubmission_onlineviva'), $attributes);
         $mform->setDefault('assignsubmission_onlineviva_maxquestion', $maxquestion);
         $mform->disabledIf('assignsubmission_onlineviva_maxquestion', 'assignsubmission_onlineviva_enabled', 'notchecked');
         //$questionlimitgrprules = array();
@@ -144,6 +162,7 @@ class assign_submission_onlineviva extends assign_submission_plugin
                 "chosenquestion"=> $chosenquestion,
             );
             //$PAGE->requires->js('mod/assign/submission/onlineviva/amd/src/funstions.js');,$opts
+            //开始录音页面点击出现
             $url=new moodle_url('submission/onlineviva/recording.php',$opts);
             $ds= \html_writer::tag('button',
                 get_string('startviva','assignsubmission_onlineviva'),

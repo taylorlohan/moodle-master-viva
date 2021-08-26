@@ -1,0 +1,28 @@
+<div class="card">
+    <div class="card-body">
+        <a class="btn btn-secondary float-right">Staff manager</a>
+        <a href="/moodle-master/mod/assign/submission/onlineviva/newQuestions.php?assignmentid={{assignmentid}}" class="btn btn-secondary float-right mr-1">Add new questions</a>
+        <br></div>
+</div>
+<div class="card">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th class="text-right">Question</th>
+            <th></th>
+
+        </tr>
+        </thead>
+        {{#data}}
+            <tr>
+                <td>{{{qorder}}}</td>
+                <td class="text-right">{{{content}}}</td>
+                <td><a href="/moodle-master/mod/assign/submission/onlineviva/newQuestions.php?id={{id}}"><i class="fa fa-edit"></i></td>
+            </tr>
+        {{/data}}
+    </table>
+    {{^data}}
+        <div class="card-body"><p>There are no results.</p></div>
+    {{/data}}
+</div>
