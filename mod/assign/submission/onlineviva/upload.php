@@ -8,6 +8,13 @@ $video = (isset($_FILES['file'])) ? $_FILES['file'] : 'video not found';
 echo var_dump($video);
 echo $_POST['name'];//传输基本数据类型的对象要用post对象接收，传输blob文件要用files对象接收
 
+$str = __DIR__;
+$web_path = str_replace('\\','/',$str);
+if (is_dir($web_path))
+{
+    define('WEBPATH', $web_path);
+}
+
 if (($_FILES['file']['type'] == "video/mp4"))//单双引号？
 {
     if ($_FILES["file"]["error"] > 0)
@@ -16,20 +23,27 @@ if (($_FILES['file']['type'] == "video/mp4"))//单双引号？
     }
     else
     {
-        echo "Upload: " . $_FILES["file"]["name"] . "<br />";
-        echo "Type: " . $_FILES["file"]["type"] . "<br />";
-        //echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
-        echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
+        $tmp = $video["tmp_name"];
+        //命名方案1
+        $ext = "mp4"; //提取扩展名
 
-        if (file_exists("upload/" . $_FILES["file"]["name"]))
+        $filename = date("YmdHis").uniqid();//生成唯一的名称
+        $basename = $filename.".".$ext;//拼接完整的命名
+//        $basename = $data["upload"]["avatar"]["name"] 获取原有名称的信息
+
+        $path = WEBPATH."/upload/";
+        $is_path = is_dir($path);
+        if($is_path==false) mkdir($path,0777,true);
+        $new_path = $path.$basename;
+
+        if (file_exists($new_path))
         {
             echo $_FILES["file"]["name"] . " already exists. ";
         }
         else
         {
-            move_uploaded_file($_FILES["file"]["tmp_name"],
-                "upload/" . $_FILES["file"]["name"]);
-            echo "Stored in: " . "upload/" . $_FILES["file"]["name"];//将文件地址放入数据库
+            move_uploaded_file($tmp,$new_path);
+            echo "Stored in: " . $new_path;//将文件地址放入数据库
         }
     }
 }
@@ -37,13 +51,3 @@ else
 {
     echo "Invalid file";
 }
-
-/*上传服务器
- * $ext = $_POST['idx'] == 1 ? '.ogg' : '.mp4';
-
-if(isset($_FILES['file']) and !$_FILES['file']['error']) {
-  $fname = "audio_" . $_POST['sessID'] . $ext;
-
-  move_uploaded_file($_FILES['file']['tmp_name'], "../../data/wav/" . $fname);
-}
- * */
