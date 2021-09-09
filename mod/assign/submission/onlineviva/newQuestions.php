@@ -14,6 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+require_once(dirname(dirname(dirname(__FILE__))).'\..\..\..\FirePHPCore/FirePHP.class.php');
 
 require(dirname(dirname(dirname(__FILE__))).'\..\..\config.php');
 global $USER, $DB, $CFG;
@@ -22,7 +23,8 @@ require_once("forms/question_form.php");
 
 $PAGE->set_url('/mod/assign/submission/onlineviva/newQuestions.php');
 //$PAGE->set_context(context_system::instance());
-
+ob_start();
+$firephp = FirePHP::getInstance(true);
 require_login();
 
 $strpagetitle = get_string('onlineviva', 'assignsubmission_onlineviva');
@@ -48,45 +50,47 @@ $toform = [];
 if ($mform->is_cancelled()) {
     //Handle form cancel operation, if cancel button is present on form
     redirect("/moodle-master/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", '', 10);
-} elseif ($fromform = $mform->get_data()) {
-    if ($assignmentid) {
+} elseif ($fromform = $mform->get_data()) {//executed when the form is submitted
+    if ($id) {//insert new record
+        $obj = $DB->get_record('onlineviva_questions', ['id'=>$id]);
+        $obj->id=$id;
+        $obj->content = $fromform->content;
+        $obj->qorder=$fromform->qorder;
+        $obj->assignment=$fromform->assignment;
+
+        $str=$DB->update_record('onlineviva_questions', $obj);
+        $firephp->fb('updated');
+        //$firephp->log($str,'updated');
+
+    }
+    else{//update record
+
         $count=$DB->count_records('onlineviva_questions',['assignment'=>$assignmentid]);
-        if ($count<=$maxquestion){
+        if ($count<$maxquestion){
             $obj = new stdClass();
             $obj->qorder=$count+1;
             $obj->assignment=$assignmentid;
             $obj->content = $fromform->content;
             $orgid = $DB->insert_record('onlineviva_questions', $obj, true, false);
+            $firephp->fb('inserted', FirePHP::INFO);
+
         }
         else{
             \core\notification::add('You have reached the maximum of the questions!', \core\output\notification::NOTIFY_WARNING);
         }
 
-    }elseif ($id){//更新问题，不能显示在框里
-        $toform = $DB->get_record('onlineviva_questions', ['id'=>$id]);
-        $mform->set_data($toform);
-
-        echo $OUTPUT->header();
-        $mform->display();
-
-        echo $OUTPUT->footer();
-
-        $obj = $DB->get_record('onlineviva_questions', ['id'=>$id]);
-        $obj->content = $fromform->content;
-        $DB->update_record('local_staffmanager_rates', $obj);
     }
-    else {
-        \core\notification::add('missing assignmentid', \core\output\notification::NOTIFY_WARNING);
-    }
+    /*else {
+        \core\notification::add('missing assignmentid or question id', \core\output\notification::NOTIFY_WARNING);
+    }*/
     // redirect to units page with qual id
     redirect("/moodle-master/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", 'Changes saved', 10,  \core\output\notification::NOTIFY_SUCCESS);
 } else {
-    // this branch is executed if the form is submitted but the data doesn't validate and the form should be redisplayed
-    // or on the first display of the form.
-    if ($assignmentid) {
-        $toform = $DB->get_record('onlineviva_questions', ['assignment'=>$assignmentid]);
+    //this branch is working when the form is not cancelled or submitted, which means editing the question form
+    if ($id) {
+        $toform = $DB->get_record('onlineviva_questions', ['id'=>$id]);
     }
-    //Set default data (if any)
+    //Set default data
     $mform->set_data($toform);
 
     echo $OUTPUT->header();
@@ -103,4 +107,11 @@ function getValue($name, $assignmentid) {//get the specific value we want from t
     );
     $current = $DB->get_record('assign_plugin_config', $dbparams, '*', IGNORE_MISSING);
     return $current->value;
+}
+function debug_to_console($data) {
+    $output = $data;
+    if (is_array($output))
+        $output = implode(',', $output);
+
+    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
 }

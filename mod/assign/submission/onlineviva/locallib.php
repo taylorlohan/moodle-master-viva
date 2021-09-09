@@ -150,18 +150,15 @@ class assign_submission_onlineviva extends assign_submission_plugin
             global $CFG, $USER, $PAGE;
             $timelimit = $this->get_config('timelimit');
             $chancelimit = $this->get_config('chancelimit');
-            //safe save有没有再看
-            $maxquestion = $this->get_config('maxquestion');
             $chosenquestion=$this->get_config('chosenquestion');
             $submissionid = $submission ? $submission->id : 0;
 
             $opts=array("component"=> 'assignsubmission_onlineviva',
                 "timelimit"=> $timelimit,
                 "chancelimit"=>$chancelimit,
-                "maxquestion"=> $maxquestion,
                 "chosenquestion"=> $chosenquestion,
             );
-            //$PAGE->requires->js('mod/assign/submission/onlineviva/amd/src/funstions.js');,$opts
+
             //开始录音页面点击出现
             $url=new moodle_url('submission/onlineviva/recording.php',$opts);
             $ds= \html_writer::tag('button',

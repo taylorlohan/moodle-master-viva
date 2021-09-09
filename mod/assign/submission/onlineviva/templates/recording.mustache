@@ -47,13 +47,14 @@
         })
                 .then(function(mediaStream) {
                     var srcvideo = document.getElementById("srcvideo")
+                    //{{{timelimit}}}拿到传过来的变量
                     srcvideo.srcObject = mediaStream;
                     srcvideo.play()
                     playCanvas(srcvideo, ctx)
                 })
 
         setRecorder();
-        setFormatSelect('video/webm;codecs=vp9')//找到合适的音频格式并导入数据库
+        setFormatSelect('video/webm;codecs=vp8')//找到合适的视频格式并导入数据库
     }
 
     function playCanvas(srcvideo, ctx) {
@@ -74,45 +75,11 @@
         setRecorder(format)
     }
 
-    //处理数据库
-    function saveAudio() {
-
-        const fullBlob = new Blob(allChunks);
-        const uploadUrl = window.URL.createObjectURL(fullBlob);
-        var myFormData = new FormData();
-        myFormData.append('audio',fullBlob);
-                $.ajax({
-                    type: "POST",
-                    url: 'upload.php',
-                    data : myFormData/*{
-                        //action : 'my_action',
-                        audio_data : myFormData
-                    }*/,
-                    contentType: false,
-                    processData: false,
-                    success: function(data)
-                    {
-                        alert("pass audio to php success!");
-                        console.log(data);
-                    }
-                });
-//试试这段代码
-        /*var xhr=new XMLHttpRequest();
-        xhr.onload=function(e) {
-          if(this.readyState === 4) {
-              console.log("Server returned: ",e.target.responseText);
-          }
-      };
-      var fd=new FormData();
-      fd.append("audio_data",fullBlob, "audio.wav");
-      xhr.open("POST","upload.php",true);
-      xhr.send(fd);*/
-//用Ajax打开一个upload.php页面，使用post传入allchunk参数，再做数据库操作
-    }
 
     function setRecorder(format) {
         const stream = canvas.captureStream(60); // 60 FPS recording
         const audioTracks = stream.getAudioTracks();//怎么只得到音频
+        const videoTracks=stream.getVideoTracks();
         const recorder = new MediaRecorder(stream, {
             mimeType: format
         });
@@ -131,11 +98,19 @@
         }
         stopBtn.onclick = e => {
             recorder.stop();
+            /*audioTracks.stop();//没有用
+            videoTracks.stop();*/
+            stream.getTracks().forEach( track => track.stop() ); // stop each of them
             console.log('recorder has stopped')
             saveAudio();
             //blobDownload(format);
             startBtn.disabled = false;
             stopBtn.disabled = true;
+        }
+        recorder.onstop=event => {
+            allChunks.push(
+                    e.data
+            );
         }
 
 
@@ -155,6 +130,30 @@
             //else console.log('recorder is null');
         }
     }
+
+    //处理上传
+    function saveAudio() {
+
+        const fullBlob = new Blob(allChunks, { type: 'video/mp4' });//
+        const uploadUrl = window.URL.createObjectURL(fullBlob);
+        var myFormData = new FormData();
+        myFormData.append('file',fullBlob);
+        myFormData.append('name', 'blobname');//Ajax数据传送没问题，问题是blob文件是空
+        $.ajax({
+            type: "POST",
+            url: 'upload.php',
+            data : myFormData,
+            contentType: false,
+            processData: false,
+            cache: false,
+            success: function(data)
+            {
+                alert("pass data to php success!");
+                console.log(data);
+            }
+        });
+    }
+
     function blobDownload(format) {
         const link = document.createElement('a');
         link.style.display = 'none';

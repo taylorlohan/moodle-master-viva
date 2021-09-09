@@ -1,6 +1,5 @@
 <div class="card">
     <div class="card-body">
-        <a class="btn btn-secondary float-right">Staff manager</a>
         <a href="/moodle-master/mod/assign/submission/onlineviva/newQuestions.php?assignmentid={{assignmentid}}" class="btn btn-secondary float-right mr-1">Add new questions</a>
         <br></div>
 </div>
@@ -9,16 +8,17 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th class="text-right">Question</th>
+            <th class="text-left">Question</th>
             <th></th>
 
         </tr>
         </thead>
         {{#data}}
             <tr>
-                <td>{{{qorder}}}</td>
-                <td class="text-right">{{{content}}}</td>
-                <td><a href="/moodle-master/mod/assign/submission/onlineviva/newQuestions.php?id={{id}}"><i class="fa fa-edit"></i></td>
+                <td></td>
+                <td class="text-left">{{{content}}}</td>
+                <td><a href="/moodle-master/mod/assign/submission/onlineviva/newQuestions.php?id={{id}}&assignmentid={{assignmentid}}"><i class="fa fa-edit"></i></td>
+                <td><a href="/moodle-master/mod/assign/submission/onlineviva/deleteQuestions.php?id={{id}}&assignmentid={{assignmentid}}"><i class="fa fa-trash"></i></td>
             </tr>
         {{/data}}
     </table>
@@ -26,3 +26,12 @@
         <div class="card-body"><p>There are no results.</p></div>
     {{/data}}
 </div>
+<script>
+    var table = document.getElementsByTagName('table')[0],
+            rows = table.getElementsByTagName('tr'),
+            text = 'textContent' in document ? 'textContent' : 'innerText';
+
+    for (var i = 1, len = rows.length; i < len; i++) {
+        rows[i].children[0][text] = i;
+    }
+</script>

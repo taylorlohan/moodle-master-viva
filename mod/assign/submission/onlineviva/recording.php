@@ -25,14 +25,16 @@ $PAGE->set_url('/mod/assign/submission/onlineviva/recording.php');
 require_login();
 
 $timelimit = optional_param('timelimit', '',PARAM_INT);
-//$timelimit = (isset($_FILES['timelimit'])) ? $_FILES['timelimit'] : 'timelimit not found';
 $chancelimit = optional_param('chancelimit', '', PARAM_INT);
-$maxquestion = optional_param('maxquestion', '', PARAM_INT);
+$chosenquestion=optional_param('chosenquestion', '', PARAM_INT);
+
+
 
 $obj = new stdClass();
 $obj->timelimit = $timelimit;
 $obj->chancelimit = $chancelimit;
-$obj->maxquestion = $maxquestion;
+$obj->chosenquestion = $chosenquestion;
+
 //$PAGE->requires->js_call_amd('/mod/assign/submission/onlineviva/amd/src/functions.js', 'init', array($obj));
 //$PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
 
