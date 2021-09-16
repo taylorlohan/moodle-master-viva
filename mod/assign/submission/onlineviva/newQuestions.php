@@ -14,7 +14,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-require_once(dirname(dirname(dirname(__FILE__))).'\..\..\..\FirePHPCore/FirePHP.class.php');
 
 require(dirname(dirname(dirname(__FILE__))).'\..\..\config.php');
 global $USER, $DB, $CFG;
@@ -23,8 +22,6 @@ require_once("forms/question_form.php");
 
 $PAGE->set_url('/mod/assign/submission/onlineviva/newQuestions.php');
 //$PAGE->set_context(context_system::instance());
-ob_start();
-$firephp = FirePHP::getInstance(true);
 require_login();
 
 $strpagetitle = get_string('onlineviva', 'assignsubmission_onlineviva');
@@ -72,7 +69,6 @@ if ($mform->is_cancelled()) {
             $obj->assignment=$assignmentid;
             $obj->content = $fromform->content;
             $orgid = $DB->insert_record('onlineviva_questions', $obj, true, false);
-            $firephp->fb('inserted', FirePHP::INFO);
 
         }
         else{
@@ -107,11 +103,4 @@ function getValue($name, $assignmentid) {//get the specific value we want from t
     );
     $current = $DB->get_record('assign_plugin_config', $dbparams, '*', IGNORE_MISSING);
     return $current->value;
-}
-function debug_to_console($data) {
-    $output = $data;
-    if (is_array($output))
-        $output = implode(',', $output);
-
-    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
 }

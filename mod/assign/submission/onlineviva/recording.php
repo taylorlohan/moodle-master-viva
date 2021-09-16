@@ -20,25 +20,41 @@ require(dirname(dirname(dirname(__FILE__))).'\..\..\config.php');
 global $USER, $DB, $CFG;
 
 $PAGE->set_url('/mod/assign/submission/onlineviva/recording.php');
+
 //$PAGE->set_context(context_module::instance());
 
 require_login();
 
-$timelimit = optional_param('timelimit', '',PARAM_INT);
-$chancelimit = optional_param('chancelimit', '', PARAM_INT);
-$chosenquestion=optional_param('chosenquestion', '', PARAM_INT);
+//$assignment=optional_param('assignment', '10', PARAM_INT);
+$submission=optional_param('submission', 11, PARAM_INT);//拿不到值
+$dbparams = array('id'=>$submission,
+);
+$record = $DB->get_record('assign_submission', $dbparams, '*', IGNORE_MISSING);
+$assignmentid=$record->assignment;
 
-
+function getValue($name, $assignmentid) {//get the specific value we want from the assign plugin configuration
+    global $DB;
+    $dbparams = array('assignment'=>$assignmentid,
+        'plugin'=>'onlineviva',
+        'name'=>$name
+    );
+    $current = $DB->get_record('assign_plugin_config', $dbparams, '*', IGNORE_MISSING);
+    return $current->value;
+}
 
 $obj = new stdClass();
-$obj->timelimit = $timelimit;
+/*
 $obj->chancelimit = $chancelimit;
-$obj->chosenquestion = $chosenquestion;
+$obj->chosenquestion = $chosenquestion;*/
+//$obj->data=array_values($records);
+$obj->assignment =$assignmentid;
+$obj->submission = $submission;
+$obj->timelimit = getValue('timelimit',$assignmentid);
 
 //$PAGE->requires->js_call_amd('/mod/assign/submission/onlineviva/amd/src/functions.js', 'init', array($obj));
 //$PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('assignsubmission_onlineviva/recording', $obj);
-
+//$PAGE->requires->js_call_amd('/mod/assign/submission/onlineviva/amd/src/functions.js','init', array($obj));
 echo $OUTPUT->footer();

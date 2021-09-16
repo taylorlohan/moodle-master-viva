@@ -1,12 +1,22 @@
 <?php
 
-//defined('MOODLE_INTERNAL') || die();
 //require_once(dirname(__FILE__).'/locallib.php');
+require(dirname(dirname(dirname(__FILE__))).'\..\..\config.php');
+global $USER,$CFG,$DB;
+//$PAGE->set_url('/mod/assign/submission/onlineviva/upload.php');
 
-print "hello upload";
 $video = (isset($_FILES['file'])) ? $_FILES['file'] : 'video not found';
-echo var_dump($video);
-echo $_POST['name'];//传输基本数据类型的对象要用post对象接收，传输blob文件要用files对象接收
+$submission=$_POST['submission'];
+$assignment=$_POST['assignment'];
+
+$dbparams = array('id'=>$assignment,);
+$record=$DB->get_record('assign', $dbparams, '*', IGNORE_MISSING);
+$courseid=$record->course;
+$cm = get_coursemodule_from_instance('assignment', $assignment, $courseid);
+$context = context_course::instance($courseid);
+$contextid = $context->id;
+echo 'context id is '. $contextid;
+
 
 $str = __DIR__;
 $web_path = str_replace('\\','/',$str);
@@ -15,7 +25,7 @@ if (is_dir($web_path))
     define('WEBPATH', $web_path);
 }
 
-if (($_FILES['file']['type'] == "video/mp4"))//单双引号？
+if (($_FILES['file']['type'] == "video/mp4"))
 {
     if ($_FILES["file"]["error"] > 0)
     {
@@ -24,17 +34,15 @@ if (($_FILES['file']['type'] == "video/mp4"))//单双引号？
     else
     {
         $tmp = $video["tmp_name"];
-        //命名方案1
-        $ext = "mp4"; //提取扩展名
+        $ext = "mp4";
 
-        $filename = date("YmdHis").uniqid();//生成唯一的名称
-        $basename = $filename.".".$ext;//拼接完整的命名
-//        $basename = $data["upload"]["avatar"]["name"] 获取原有名称的信息
+        $filename = date("YmdHis").uniqid();
+        $basename = $filename.".".$ext;
 
         $path = WEBPATH."/upload/";
         $is_path = is_dir($path);
         if($is_path==false) mkdir($path,0777,true);
-        $new_path = $path.$basename;
+        $new_path = $path.$basename;//new path 是要插入的文件的地址
 
         if (file_exists($new_path))
         {
@@ -42,8 +50,35 @@ if (($_FILES['file']['type'] == "video/mp4"))//单双引号？
         }
         else
         {
-            move_uploaded_file($tmp,$new_path);
-            echo "Stored in: " . $new_path;//将文件地址放入数据库
+            move_uploaded_file($tmp,$new_path);//放到了upload文件夹下
+            $obj = new stdClass();
+            $obj->assignment=$assignment;
+            $obj->submission=$submission;
+            $obj->videofile='test content1';//放什么内容?数量还是名字还是地址
+            $fileid=$DB->insert_record('assignsubmission_onlineviva', $obj, true, false);//记录放入数据库
+            echo 'file id is '.$fileid;
+            echo 'upload into database';
+
+            //创建一个新的file area文件
+            $path=$CFG->dirroot.'/mod/assign/submission/onlineviva/upload/'.$basename;
+            echo 'path is '.$path;//到此之前都正确
+            if($fs = get_file_storage())//不能调用
+                echo 'fs success';
+            else
+                echo 'fs fail';
+            //$fs->get_area_files();
+            $file_record = array(
+                'contextid'=>$contextid,
+                'component'=>'assignsubmission_onlineviva',
+                'filearea'=>ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,
+                'itemid'=>$fileid,
+                'filepath'=>'/',
+                'filename'=>$basename
+            );
+
+            echo "file record is".$file_record;
+            //$file = $fs->create_file_from_pathname($file_record, $path);
+            echo "file area created!";
         }
     }
 }

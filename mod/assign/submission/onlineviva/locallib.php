@@ -25,11 +25,10 @@ class assign_submission_onlineviva extends assign_submission_plugin
      */
     private function get_onlinetext_submission($submissionid) {
         global $DB;
-        //需要数据库设计
         return $DB->get_record('assignsubmission_onlineviva', array('submission'=>$submissionid));
     }
 
-    public function remove(stdClass $submission) {//不知道可不可以用
+    public function remove(stdClass $submission) {
         global $DB;
 
         $submissionid = $submission ? $submission->id : 0;
@@ -107,8 +106,8 @@ class assign_submission_onlineviva extends assign_submission_plugin
 
 
 
-        public function save_settings(stdClass $data) {
-            //时间限制
+    public function save_settings(stdClass $data) {
+
             if (empty($data->assignsubmission_onlineviva_timelimit)) {
                 $timelimit = 0;
             } else {
@@ -145,22 +144,18 @@ class assign_submission_onlineviva extends assign_submission_plugin
             $this->set_config('chosenquestion', $chosenquestion);
             return true;
         }
-
         public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
             global $CFG, $USER, $PAGE;
+            $assignmentid=$this->assignment->get_instance()->id;
+            $contextid=$this->assignment->get_context()->id;
             $timelimit = $this->get_config('timelimit');
             $chancelimit = $this->get_config('chancelimit');
             $chosenquestion=$this->get_config('chosenquestion');
             $submissionid = $submission ? $submission->id : 0;
-
-            $opts=array("component"=> 'assignsubmission_onlineviva',
-                "timelimit"=> $timelimit,
-                "chancelimit"=>$chancelimit,
-                "chosenquestion"=> $chosenquestion,
-            );
+            $nums=array("submission"=> $submissionid, "context"=>$contextid);
 
             //开始录音页面点击出现
-            $url=new moodle_url('submission/onlineviva/recording.php',$opts);
+            $url=new moodle_url('submission/onlineviva/recording.php',$nums);
             $ds= \html_writer::tag('button',
                 get_string('startviva','assignsubmission_onlineviva'),
                 array('type'=>'button','id'=>'startviva','onclick'=>"window.open('{$url}' );"));
@@ -169,14 +164,24 @@ class assign_submission_onlineviva extends assign_submission_plugin
 
         }
 
-    public function get_files(stdClass $submission, stdClass $user=null) {
+    public function get_files(stdClass $submission, stdClass $user) {
         $result = array();
         $fs = get_file_storage();
 
-        $files = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, "timemodified", false);
+        $files = $fs->get_area_files($this->assignment->get_context()->id,
+            'assignsubmission_onlineviva',
+            ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,
+            $submission->id,
+            'timemodified',
+            false);
 
         foreach ($files as $file) {
-            $result[$file->get_filename()] = $file;
+            // Do we return the full folder path or just the file name?
+            if (isset($submission->exportfullpath) && $submission->exportfullpath == false) {
+                $result[$file->get_filename()] = $file;
+            } else {
+                $result[$file->get_filepath().$file->get_filename()] = $file;
+            }
         }
         return $result;
     }
@@ -235,8 +240,8 @@ class assign_submission_onlineviva extends assign_submission_plugin
             $oldsubmission->id,
             // New file area
             $this->assignment->get_context()->id,
-            'assignsubmission_onlineaudio',
-            ASSIGN_FILEAREA_SUBMISSION_ONLINEAUDIO,
+            'assignsubmission_onlineviva',
+            ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,
             $submission->id);
 
         return true;
