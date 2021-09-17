@@ -2,22 +2,29 @@
 
 //require_once(dirname(__FILE__).'/locallib.php');
 require(dirname(dirname(dirname(__FILE__))).'\..\..\config.php');
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
 global $USER,$CFG,$DB;
 //$PAGE->set_url('/mod/assign/submission/onlineviva/upload.php');
 
 $video = (isset($_FILES['file'])) ? $_FILES['file'] : 'video not found';
 $submission=$_POST['submission'];
 $assignment=$_POST['assignment'];
+echo 'submission id is '.$submission;
 
-$dbparams = array('id'=>$assignment,);
-$record=$DB->get_record('assign', $dbparams, '*', IGNORE_MISSING);
+$record=$DB->get_record('assign', ['id'=>$assignment], '*', IGNORE_MISSING);
 $courseid=$record->course;
-$cm = get_coursemodule_from_instance('assignment', $assignment, $courseid);
+
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+
+$cm = get_coursemodule_from_instance('assign', $assignment, $courseid);
 $context = context_course::instance($courseid);
 $contextid = $context->id;
-echo 'context id is '. $contextid;
 
+$newassignment = new assign($context,$cm,$course);
+$submission_plugin = $newassignment->get_submission_plugin_by_type('onlineviva');
+$submission_plugin->add_recording();
 
+/*
 $str = __DIR__;
 $web_path = str_replace('\\','/',$str);
 if (is_dir($web_path))
@@ -85,4 +92,4 @@ if (($_FILES['file']['type'] == "video/mp4"))
 else
 {
     echo "Invalid file";
-}
+}*/

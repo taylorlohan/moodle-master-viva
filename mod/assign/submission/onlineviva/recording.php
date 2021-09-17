@@ -26,7 +26,7 @@ $PAGE->set_url('/mod/assign/submission/onlineviva/recording.php');
 require_login();
 
 //$assignment=optional_param('assignment', '10', PARAM_INT);
-$submission=optional_param('submission', 11, PARAM_INT);//拿不到值
+$submission=optional_param('submission', 11, PARAM_INT);
 $dbparams = array('id'=>$submission,
 );
 $record = $DB->get_record('assign_submission', $dbparams, '*', IGNORE_MISSING);

@@ -148,11 +148,12 @@ class assign_submission_onlineviva extends assign_submission_plugin
             global $CFG, $USER, $PAGE;
             $assignmentid=$this->assignment->get_instance()->id;
             $contextid=$this->assignment->get_context()->id;
+            $cm=$this->assignment->get_course_module()->id;
             $timelimit = $this->get_config('timelimit');
             $chancelimit = $this->get_config('chancelimit');
             $chosenquestion=$this->get_config('chosenquestion');
             $submissionid = $submission ? $submission->id : 0;
-            $nums=array("submission"=> $submissionid, "context"=>$contextid);
+            $nums=array("submission"=> $submissionid, "cmid"=>$cm);
 
             //开始录音页面点击出现
             $url=new moodle_url('submission/onlineviva/recording.php',$nums);
@@ -161,6 +162,8 @@ class assign_submission_onlineviva extends assign_submission_plugin
                 array('type'=>'button','id'=>'startviva','onclick'=>"window.open('{$url}' );"));
             $mform->addElement('static','startvivabtn',
                 get_string('startviva','assignsubmission_onlineviva'),$ds);
+
+            //$button = new portfolio_add_button();
 
         }
 
@@ -209,6 +212,10 @@ class assign_submission_onlineviva extends assign_submission_plugin
             return true;
         }
         return false;
+    }
+
+    public function add_recording() {
+        echo 'add recording init!';
     }
 
     /*public function upgrade_settings(context $oldcontext,stdClass $oldassignment, & $log) {
