@@ -20,9 +20,17 @@ $cm = get_coursemodule_from_instance('assign', $assignment, $courseid);
 $context = context_course::instance($courseid);
 $contextid = $context->id;
 
+//$viewurl = $CFG->wwwroot.'/mod/assign/view.php?id='.$cm->id.'&action=editsubmission';
+
 $newassignment = new assign($context,$cm,$course);
 $submission_plugin = $newassignment->get_submission_plugin_by_type('onlineviva');
-$submission_plugin->add_recording();
+$submission = $newassignment->get_user_submission($USER->id, true);
+if($submission_plugin->add_recording($video,$submission)) {
+    echo 'uploaded success!';
+    //alert, 不能返回，并添加返回链接
+} else {
+    echo 'uploaded fail';
+}
 
 /*
 $str = __DIR__;

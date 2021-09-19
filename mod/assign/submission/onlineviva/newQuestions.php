@@ -56,8 +56,6 @@ if ($mform->is_cancelled()) {
         $obj->assignment=$fromform->assignment;
 
         $str=$DB->update_record('onlineviva_questions', $obj);
-        $firephp->fb('updated');
-        //$firephp->log($str,'updated');
 
     }
     else{//update record

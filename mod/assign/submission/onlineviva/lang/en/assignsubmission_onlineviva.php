@@ -20,6 +20,8 @@ $string['pluginname'] = 'Online viva submissions';
 $string['chosenquestion'] = 'Number of questions chosen';
 $string['maxquestion_add'] = 'Add questions';
 $string['Addquestions']='Adding questions';
+$string['uploaderror']='upload to file system fails';
+
 
 
 
