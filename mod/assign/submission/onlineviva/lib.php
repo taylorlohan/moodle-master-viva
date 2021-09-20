@@ -65,15 +65,6 @@ function assignsubmission_onlineviva_pluginfile($course, $cm, context $context, 
     if ($USER->id != $userid and !has_capability('mod/assign:grade', $context)) {
         return false;
     }
-    if ($assign->get_instance()->teamsubmission &&
-        !$assign->can_view_group_submission($groupid)) {
-        return false;
-    }
-
-    if (!$assign->get_instance()->teamsubmission &&
-        !$assign->can_view_submission($userid)) {
-        return false;
-    }
 
     $relativepath = implode('/', $args);
 

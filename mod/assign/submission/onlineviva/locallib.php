@@ -146,15 +146,16 @@ class assign_submission_onlineviva extends assign_submission_plugin
         }
 
         public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
-            global $CFG, $USER, $PAGE;
+            global $CFG, $USER, $PAGE,$DB;
             $assignmentid=$this->assignment->get_instance()->id;
-            $contextid=$this->assignment->get_context()->id;
+            $context=$this->assignment->get_context();
             $cm=$this->assignment->get_course_module()->id;
             $timelimit = $this->get_config('timelimit');
             $chancelimit = $this->get_config('chancelimit');
             $chosenquestion=$this->get_config('chosenquestion');
             $submissionid = $submission ? $submission->id : 0;
             $nums=array("submission"=> $submissionid, "cmid"=>$cm);
+
 
             //开始录音页面点击出现
             $url=new moodle_url('submission/onlineviva/recording.php',$nums);
@@ -164,77 +165,40 @@ class assign_submission_onlineviva extends assign_submission_plugin
             $mform->addElement('static','startvivabtn',
                 get_string('startviva','assignsubmission_onlineviva'),$ds);
 
-            //$mform->addElement('html', '<a href="' . $url . '">'.s($filename).' </a> ');
-
-            //$mform->addElement('html', '<a href="' .  . '">'.s($filename).' </a> ');
-            $mform->addElement('html', $this->print_user_files($submissionid));//输出已录制的文件
+            echo 'submission id is'.$submissionid;
+            //$mform->addElement('', $this->print_user_files($submissionid));
+            $mform->addElement('static', 'onlinevivafiles',
+                get_string('vivafiles','assignsubmission_onlineviva'),$this->print_user_files($submissionid));
 
         }
 
     public function print_user_files($submissionid)
     {//allowdelete?
-        global $CFG, $OUTPUT, $DB;
 
-        $output = '';
+        //$output='context is '.$contextid;
+        $contextid=$this->assignment->get_context()->id;
         $fs = get_file_storage();
-        $files = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,  false, "id",);
-        if (!empty($files)) {//为什么为空呢
-            require_once($CFG->dirroot . '/mod/assign/locallib.php');
-            /*if ($CFG->enableportfolios) {
-                $button = new portfolio_add_button();
-            }*/
+        $files = $fs->get_area_files($contextid, 'assignsubmission_onlineviva', 'submission_onlineviva',  $submissionid, "id",);//写常量可以查到
+        if($files){
             foreach ($files as $file) {
                 $filename = $file->get_filename();
                 $filepath = $file->get_filepath();
                 $mimetype = $file->get_mimetype();
                 //$path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$this->assignment->get_context()->id.'/assignsubmission_onlineviva/submission_onlineviva/'.$submissionid.'/'.$filename);
-                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $filepath, $filename, false);
-                $output.= '<a href="' . $url . '">'.s($filename).' </a> ';
-                // Dummy link for media filters
-                /*$options = array(
-                    'context' => $this->assignment->get_context(),
-                    'trusted' => true,
-                    'noclean' => true
-                );
-                $filtered = format_text('<a href="' . $url . '" style="display:none;"> </a> ', $format = FORMAT_HTML, $options);
-                $filtered = preg_replace('~<a.+?</a>~', '', $filtered);
-                // Add a real link after the dummy one, so that we get a proper download link no matter what
-                $output .= $filtered . '</span><a href="' . $url . '" >' . s($filename) . '</a>';*/
-                //$output='<a href="' . $url . '">'.s($filename).' </a> ';
-                /*if($allowdelete) {
-                    $delurl  = "$CFG->wwwroot/mod/assign/submission/onlineaudio/delete.php?id={$this->assignment->get_course_module()->id}&amp;sid={$submissionid}&amp;path=$filepath&amp;file=$filename";//&amp;userid={$submission->userid} &amp;mode=$mode&amp;offset=$offset
+                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $filepath, $filename, true);
 
-                    $output .= '<a href="'.$delurl.'">&nbsp;'
-                        .'<img title="'.$strdelete.'" src="'.$OUTPUT->pix_url('/t/delete').'" class="iconsmall" alt="" /></a> ';
-                }*/
-                /*if ($CFG->enableportfolios && has_capability('mod/assign:exportownsubmission', $this->assignment->get_context())) {
-                    $button->set_callback_options('assign_portfolio_caller', array('cmid' => $this->assignment->get_course_module()->id, 'sid' => $submissionid, 'area' => ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA), '/mod/assign/portfolio_callback.php');
-                    $button->set_format_by_file($file);
-                    $output .= $button->to_html(PORTFOLIO_ADD_ICON_LINK);
-                }*/
-                /*if (!empty($CFG->enableplagiarism)) {
-                    // Wouldn't it be nice if the assignment's get_submission method wasn't private?
-                    $submission = $DB->get_record('assign_submission', array('assignment'=>$this->assignment->get_instance()->id, 'id'=>$submissionid), '*', MUST_EXIST);
-                    $output .= plagiarism_get_links(array('userid'=>$submission->userid, 'file'=>$file, 'cmid'=>$this->assignment->get_course_module()->id, 'course'=>$this->assignment->get_course(), 'assignment'=>$this->assignment));
-                }
-                $output .= '<br />';
-            }*/
-                /*if ($CFG->enableportfolios && count($files) > 1 && has_capability('mod/assign:exportownsubmission', $this->assignment->get_context())) {
-                    $button->set_callback_options('assign_portfolio_caller', array('cmid' => $this->assignment->get_course_module()->id, 'sid' => $submissionid, 'area' => ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA), '/mod/assign/portfolio_callback.php');
-                    $output .= '<br />' . $button->to_html(PORTFOLIO_ADD_TEXT_LINK);
-                }*/
-            }
-
-            $output = '<div class="files" style="float:left;margin-left:25px;">' . $output . '</div><br clear="all" />';
-
+                $output .= '<a href="' . $url . '">' . s($filename) . ' </a> ';
+        }
             return $output;
         }
-        else{//没有查到文件被上传，所以不显示
+        else{
             $filename='no files uploaded!';
             $url=new moodle_url('submission/onlineviva/recording.php');
             $output='<a href="' . $url . '">'.s($filename).' </a> ';
             return $output;
         }
+
+
     }
 
     public function get_files(stdClass $submission, stdClass $user) {
@@ -265,14 +229,18 @@ class assign_submission_onlineviva extends assign_submission_plugin
         // Show we show a link to view all files for this plugin?
         $showviewlink = $count > ASSIGN_SUBMISSION_ONLINEVIVA_MAX_SUMMARY_FILES;
         if ($count <= ASSIGN_SUBMISSION_ONLINEVIVA_MAX_SUMMARY_FILES) {
-            return $this->print_user_files($submission->id);
+            return $this->assignment->render_area_files('assignsubmission_onlineviva',
+                ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,
+                $submission->id);
         } else {
             return get_string('countfiles', 'assignsubmission_onlineviva', $count);
         }
     }
 
     public function view(stdClass $submission) {
-        return $this->assignment->render_area_files('assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id);
+        return $this->assignment->render_area_files('assignsubmission_onlineviva',
+            ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,
+            $submission->id);
     }
 
     public function can_upgrade($type, $version) {
@@ -284,9 +252,10 @@ class assign_submission_onlineviva extends assign_submission_plugin
 
     public function add_recording($video, $submission) {
         global $USER, $DB;
-
         $fs = get_file_storage();
         $filesubmission = $this->get_onlineviva_submission($submission->id);
+
+        $contextid = $this->assignment->get_context()->id;
 
         $filename = $video['name'];
         $filesrc = $video['tmp_name'];
@@ -304,13 +273,13 @@ class assign_submission_onlineviva extends assign_submission_plugin
         $filename=$temp_name.".$ext";
         // check for filename already existing and add suffix #.
         $n=1;
-        while($fs->file_exists($this->assignment->get_context()->id, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, '/', $filename)) {
+        while($fs->file_exists($contextid, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, '/', $filename)) {
             $filename=$temp_name.'_'.$n++.".$ext";
         }
         $author = $DB->get_record('user', array('id'=>$USER->id ), '*', MUST_EXIST);
         // Create file
         $fileinfo = array(
-            'contextid' => $this->assignment->get_context()->id,
+            'contextid' => $contextid,
             'component' => 'assignsubmission_onlineviva',
             'filearea' => ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA,
             'itemid' => $submission->id,
@@ -321,37 +290,19 @@ class assign_submission_onlineviva extends assign_submission_plugin
 
         );
         if ($newfile = $fs->create_file_from_pathname($fileinfo, $filesrc)) {
-            $files = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, "id", false);
+            $files = $fs->get_area_files($contextid, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, "id", false);
             $count = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
-            echo 'count is '.$count;
-            foreach ($files as $f) {
-                // $f is an instance of stored_file
-                echo $f->get_filename();
-            }
-            return true;
-            /*$eventdata = new stdClass();
-            $eventdata->modulename = 'assign';
-            $eventdata->cmid = $this->assignment->get_course_module()->id;
-            $eventdata->itemid = $submission->id;
-            $eventdata->courseid = $this->assignment->get_course()->id;
-            $eventdata->userid = $USER->id;
-            if ($count > 1) {
-                $eventdata->files = $files;
-            }
-            $eventdata->file = $files;
-            $event=assignsubmission_file\event\assessable_uploaded::create($eventdata);
-            $event->trigger();
-            return true;            *///插入数据库记录
-            /*if ($filesubmission) {
-                $filesubmission->numfiles = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
+            //插入数据库记录,还没测试过
+            if ($filesubmission) {
+                $filesubmission->videofile = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
                 return $DB->update_record('assignsubmission_onlineviva', $filesubmission);
             } else {
                 $filesubmission = new stdClass();
-                $filesubmission->numfiles = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
+                $filesubmission->videofile = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
                 $filesubmission->submission = $submission->id;
                 $filesubmission->assignment = $this->assignment->get_instance()->id;
                 return $DB->insert_record('assignsubmission_onlineviva', $filesubmission) > 0;
-            }*/
+            }
         }
         else
             return false;
