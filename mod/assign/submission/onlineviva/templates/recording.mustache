@@ -19,11 +19,25 @@
     <p class="count"></p>
 </div>
 <div style="text-align: center;margin-top:10px;">
-    <button id="startBtn" disabled>开始录制</button>
-    <button id="stopBtn" disabled>结束录制</button>
+    <button id="startBtn" disabled>start recording</button>
+    <button id="stopBtn" disabled>end recording</button>
 </div>
 <div style="text-align: center;margin-top:20px;">
     <p>Questions for viva</p>
+    <table>
+        {{#questions}}
+            <tr>
+                <td></td>
+                <td id="questions" class="text-left">{{{content}}}</td>
+            </tr>
+        {{/questions}}
+        {{^questions}}
+            <div class="card-body"><p>There are no results.</p></div>
+        {{/questions}}
+    </table>
+    <!--
+
+    <button id="skipBtn" >next question</button>-->
     <!--
     <p><input type="radio" name="format" value="video/webm;codecs=vp8" onclick="setFormatSelect('video/webm;codecs=vp8')">video/webm;codecs=vp8</p>
      -->
@@ -32,25 +46,35 @@
 <div
         id="test"
         data-assignment={{assignment}}> </div>
-
 <div
         id="test1"
         data-submission={{submission}}> </div>
+<div
+        id="test2"
+        data-chosenquestion={{chosenquestion}}> </div>
+
 
 
 
 <script>
     var allChunks = [];
-    let c=10;//页面倒计时
+    let c=10;
     let assignment = document.querySelector('#test').dataset.assignment;
     let submission = document.querySelector('#test1').dataset.submission;
+    let chosenquestion = document.querySelector('#test2').dataset.chosenquestion;
+    let content=['test','test1','test2','test3'];
+    let i=0;
+    /*let table = document.getElementsByTagName('table')[0],
+            rows = table.getElementsByTagName('tr');
+    for (let j=0, len = rows.length; j < len; j++) {
+        rows[j].children[0][text] = j;
+    }*/
 
     init();
     function init() {
-        console.log('hello init');
         console.log('assignment is'+assignment);
         console.log('submission is'+submission);
-
+        console.log('chosen total is '+chosenquestion);
 
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'white';
@@ -66,7 +90,7 @@
                     playCanvas(srcvideo, ctx)
                 })
         setRecorder();
-        setFormatSelect('video/webm;codecs=vp8')//找到合适的视频格式并导入数据库
+        setFormatSelect('video/webm;codecs=vp8')
     }
     function playCanvas(srcvideo, ctx) {
         ctx.drawImage(srcvideo, 0, 0, 640, 460)
@@ -77,7 +101,7 @@
     function setFormatSelect(format){
         if(!MediaRecorder.isTypeSupported(format)){
             alert(format)
-            alert("当前浏览器不支持该编码类型");//最后可以去掉
+            alert("当前浏览器不支持该编码类型");
             return;
         }
         allChunks = [];
@@ -99,6 +123,7 @@
         startBtn.onclick = e => {
             recorder.start(10);
             timedCount();
+            skipQuestion();
             startBtn.disabled = true;
             stopBtn.disabled = false;
         }
@@ -106,13 +131,18 @@
             recorder.stop();
             /*audioTracks.stop();//没有用
             videoTracks.stop();*/
-            stream.getTracks().forEach( track => track.stop() ); // stop each of them
+            stream.getTracks().forEach( track => track.stop() );
             console.log('recorder has stopped')
             saveAudio();
             //blobDownload(format);
             startBtn.disabled = false;
             stopBtn.disabled = true;
         }
+
+        /*skipBtn.onclick = e => {
+            i++;
+            skipQuestion();
+        }*/
         recorder.onstop=event => {
             allChunks.push(
                     e.data
@@ -125,14 +155,26 @@
         if (c > 0) {
             let t = setTimeout(timedCount, 1000);
         } else {
-            //recorder.stop();
             document.querySelector(".count").innerHTML = "Time is up!";
             stopBtn.click()
             console.log('stop is clicked')
             return;
         }
     }
+/*
+    function skipQuestion() {
 
+        if(i<chosenquestion){
+            rows[i].show();
+            //document.querySelector("#questions").innerHTML = 'question' +(i+1)+'.'+ rows[i];
+        }
+        else{
+            rows[i].children[1][innerText] = 'no questions to anwser!';
+            //document.querySelector(".questions").innerHTML = 'no questions to anwser!';
+        }
+
+    }
+*/
     function saveAudio() {
         const fullBlob = new Blob(allChunks, { type: 'video/mp4' });
         const uploadUrl = window.URL.createObjectURL(fullBlob);

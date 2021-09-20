@@ -42,17 +42,17 @@ function getValue($name, $assignmentid) {//get the specific value we want from t
     return $current->value;
 }
 
+$questions=array();
+
 $obj = new stdClass();
-/*
-$obj->chancelimit = $chancelimit;
-$obj->chosenquestion = $chosenquestion;*/
-//$obj->data=array_values($records);
 $obj->assignment =$assignmentid;
 $obj->submission = $submission;
 $obj->timelimit = getValue('timelimit',$assignmentid);
+$obj->chosenquestion=getValue('chosenquestion',$assignmentid);
+$qparams=array('assignment'=>$assignmentid);
+$questionrecords = $DB->get_records('onlineviva_questions', $qparams, 'id','*');
+$obj->questions=array_values($questionrecords);
 
-//$PAGE->requires->js_call_amd('/mod/assign/submission/onlineviva/amd/src/functions.js', 'init', array($obj));
-//$PAGE->requires->js('/mod/assign/submission/onlineviva/amd/src/functions.js');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('assignsubmission_onlineviva/recording', $obj);
