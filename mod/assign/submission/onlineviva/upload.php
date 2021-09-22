@@ -28,7 +28,7 @@ if($submission_plugin->add_recording($video,$submission)) {
     echo 'uploaded success!';
     echo $submission_plugin->add_recording($video,$submission);
     echo 'upload new page contextid is '.$contextid;
-    //alert, 不能返回，并添加返回链接
+    //alert();
 } else {
     echo 'uploaded fail';
 }

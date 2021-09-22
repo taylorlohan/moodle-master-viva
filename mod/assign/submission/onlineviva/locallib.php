@@ -39,7 +39,6 @@ class assign_submission_onlineviva extends assign_submission_plugin
     }
     public function get_settings(MoodleQuickForm $mform)
     {
-        global $CFG, $COURSE;
         $assignmentid=$this->assignment->get_instance()->id;
 
         $timelimit = $this->get_config('timelimit');
@@ -47,19 +46,23 @@ class assign_submission_onlineviva extends assign_submission_plugin
         $maxquestion = $this->get_config('maxquestion');
         $chosenquestion = $this->get_config('chosenquestion');
 
-        //时间限制
-        $mform->addElement('duration', 'assignsubmission_onlineviva_timelimit', get_string('timelimit', 'assignsubmission_onlineviva'));
+        //time limit setting
+        $mform->addElement('duration', 'assignsubmission_onlineviva_timelimit',
+            get_string('timelimit', 'assignsubmission_onlineviva'));
         $mform->setDefault('assignsubmission_onlineviva_timelimit', $timelimit);
-        $mform->disabledIf('assignsubmission_onlineviva_timelimit', 'assignsubmission_onlineviva_enabled', 'notchecked');//能找到enabled吗
+        $mform->disabledIf('assignsubmission_onlineviva_timelimit',
+            'assignsubmission_onlineviva_enabled', 'notchecked');
         $mform->hideIf('assignsubmission_onlineviva_timelimit',
             'assignsubmission_onlineviva_enabled',
             'notchecked');
 
-        //允许回答次数
+        //attempt chances setting
         $chanceoptions = array('1', '2', '3', '4', '5');
-        $mform->addElement('select', 'assignsubmission_onlineviva_chancelimit', get_string('chancelimit', 'assignsubmission_onlineviva'), $chanceoptions);
+        $mform->addElement('select', 'assignsubmission_onlineviva_chancelimit',
+            get_string('chancelimit', 'assignsubmission_onlineviva'), $chanceoptions);
         $mform->setDefault('assignsubmission_onlineviva_chancelimit', $chancelimit);
-        $mform->disabledIf('assignsubmission_onlineviva_chancelimit', 'assignsubmission_onlineviva_enabled', 'notchecked');
+        $mform->disabledIf('assignsubmission_onlineviva_chancelimit',
+            'assignsubmission_onlineviva_enabled', 'notchecked');
         $mform->hideIf('assignsubmission_onlineviva_chancelimit',
             'assignsubmission_onlineviva_enabled',
             'notchecked');
@@ -69,35 +72,34 @@ class assign_submission_onlineviva extends assign_submission_plugin
         $nums=array("assignmentid"=> $assignmentid,
                      );
 
-
-        //添加问题页面按钮
+        //add questions in the setting page
         $url=new moodle_url('../mod/assign/submission/onlineviva/addQuestions.php', $nums);
         $ds= \html_writer::tag('button',
             get_string('maxquestion_add','assignsubmission_onlineviva'),
             array('type'=>'button','id'=>'addQuestionbtn','onclick'=>"window.open('{$url}' );"));
 
-        $attributes = array('size' => '20');//size设置正确吗？
+        $attributes = array('size' => '20');
         $maxquestiongrp = array();
-        $maxquestiongrp[] = $mform->createElement('text', 'assignsubmission_onlineviva_maxquestion', get_string('maxquestion', 'assignsubmission_onlineviva'), $attributes);
+        $maxquestiongrp[] = $mform->createElement('text', 'assignsubmission_onlineviva_maxquestion',
+            get_string('maxquestion', 'assignsubmission_onlineviva'), $attributes);
         $maxquestiongrp[] = $mform->createElement('static','addQuestionbtn',
             get_string('maxquestion_add','assignsubmission_onlineviva'),$ds);
-        //$maxquestiongrp[] = $mform->createElement('button', 'add questions', get_string('maxquestion_add', 'assignsubmission_onlineviva'));
         $mform->addGroup($maxquestiongrp, 'assignsubmission_onlineviva_question_group', $name, ' ', false);
-        //$mform->addElement('text', 'assignsubmission_onlineviva_maxquestion', get_string('maxquestion', 'assignsubmission_onlineviva'), $attributes);
+
         $mform->setDefault('assignsubmission_onlineviva_maxquestion', $maxquestion);
-        $mform->disabledIf('assignsubmission_onlineviva_maxquestion', 'assignsubmission_onlineviva_enabled', 'notchecked');
-        //$questionlimitgrprules = array();
-        //$questionlimitgrprules['onlineviva_maxquestion'][] = array(null, 'numeric', null, 'client');
-        //$mform->addGroupRule('onlineviva_maxquestion', $questionlimitgrprules);
+        $mform->disabledIf('assignsubmission_onlineviva_maxquestion',
+            'assignsubmission_onlineviva_enabled', 'notchecked');
         $mform->setType('assignsubmission_onlineviva_maxquestion', PARAM_INT);
         $mform->hideIf('assignsubmission_onlineviva_maxquestion',
             'assignsubmission_onlineviva_enabled',
             'notchecked');
 
         //chosenquestions
-        $mform->addElement('text', 'assignsubmission_onlineviva_chosenquestion', get_string('chosenquestion', 'assignsubmission_onlineviva'), $attributes);
+        $mform->addElement('text', 'assignsubmission_onlineviva_chosenquestion',
+            get_string('chosenquestion', 'assignsubmission_onlineviva'), $attributes);
         $mform->setDefault('assignsubmission_onlineviva_chosenquestion', $chosenquestion);
-        $mform->disabledIf('assignsubmission_onlineviva_chosenquestion', 'assignsubmission_onlineviva_enabled', 'notchecked');
+        $mform->disabledIf('assignsubmission_onlineviva_chosenquestion',
+            'assignsubmission_onlineviva_enabled', 'notchecked');
         $mform->setType('assignsubmission_onlineviva_chosenquestion', PARAM_INT);
         $mform->hideIf('assignsubmission_onlineviva_chosenquestion',
             'assignsubmission_onlineviva_enabled',
@@ -117,16 +119,15 @@ class assign_submission_onlineviva extends assign_submission_plugin
             $this->set_config('timelimit', $timelimit);
             //$this->set_config('wordlimitenabled', $wordlimitenabled);
 
-            //允许回答次数
+            //attempt chances limit
             if (empty($data->assignsubmission_onlineviva_chancelimit)) {
                 $chancelimit = 0;
             } else {
                 $chancelimit = $data->assignsubmission_onlineviva_chancelimit;
             }
 
-            $this->set_config('chancelimit', $chancelimit);
+            $this->set_config('chancelimit', $chancelimit+1);
 
-            //问题数量
             if (empty($data->assignsubmission_onlineviva_maxquestion)) {
                 $maxquestion = 0;
             } else {
@@ -146,18 +147,13 @@ class assign_submission_onlineviva extends assign_submission_plugin
         }
 
         public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
-            global $CFG, $USER, $PAGE,$DB;
-            $assignmentid=$this->assignment->get_instance()->id;
-            $context=$this->assignment->get_context();
+
             $cm=$this->assignment->get_course_module()->id;
-            $timelimit = $this->get_config('timelimit');
             $chancelimit = $this->get_config('chancelimit');
-            $chosenquestion=$this->get_config('chosenquestion');
             $submissionid = $submission ? $submission->id : 0;
             $nums=array("submission"=> $submissionid, "cmid"=>$cm);
 
-
-            //开始录音页面点击出现
+            //start recording page
             $url=new moodle_url('submission/onlineviva/recording.php',$nums);
             $ds= \html_writer::tag('button',
                 get_string('startviva','assignsubmission_onlineviva'),
@@ -165,27 +161,33 @@ class assign_submission_onlineviva extends assign_submission_plugin
             $mform->addElement('static','startvivabtn',
                 get_string('startviva','assignsubmission_onlineviva'),$ds);
 
-            echo 'submission id is'.$submissionid;
-            //$mform->addElement('', $this->print_user_files($submissionid));
+            if($chancelimit<=$this->count_files($submissionid,ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA)){
+                $mform->addElement('static','chances', 'attempt chances','You have reached the maximum number of attempt chances!');
+            }
+            else{
+                $mform->addElement('static','chances', 'attempt chances',$chancelimit);
+
+            }
             $mform->addElement('static', 'onlinevivafiles',
                 get_string('vivafiles','assignsubmission_onlineviva'),$this->print_user_files($submissionid));
 
         }
 
     public function print_user_files($submissionid)
-    {//allowdelete?
-
-        //$output='context is '.$contextid;
+    {
         $contextid=$this->assignment->get_context()->id;
         $fs = get_file_storage();
-        $files = $fs->get_area_files($contextid, 'assignsubmission_onlineviva', 'submission_onlineviva',  $submissionid, "id",);//写常量可以查到
+        $files = $fs->get_area_files($contextid, 'assignsubmission_onlineviva',
+            'submission_onlineviva',
+            $submissionid, "id",);
         if($files){
             foreach ($files as $file) {
                 $filename = $file->get_filename();
                 $filepath = $file->get_filepath();
                 $mimetype = $file->get_mimetype();
-                //$path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$this->assignment->get_context()->id.'/assignsubmission_onlineviva/submission_onlineviva/'.$submissionid.'/'.$filename);
-                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $filepath, $filename, true);
+                $url = moodle_url::make_pluginfile_url($file->get_contextid(),
+                    $file->get_component(), $file->get_filearea(),
+                    $file->get_itemid(), $filepath, $filename, true);
 
                 $output .= '<a href="' . $url . '">' . s($filename) . ' </a> ';
         }
@@ -197,8 +199,6 @@ class assign_submission_onlineviva extends assign_submission_plugin
             $output='<a href="' . $url . '">'.s($filename).' </a> ';
             return $output;
         }
-
-
     }
 
     public function get_files(stdClass $submission, stdClass $user) {
@@ -254,6 +254,7 @@ class assign_submission_onlineviva extends assign_submission_plugin
         global $USER, $DB;
         $fs = get_file_storage();
         $filesubmission = $this->get_onlineviva_submission($submission->id);
+        $chancelimit = $this->get_config('chancelimit');
 
         $contextid = $this->assignment->get_context()->id;
 
@@ -263,17 +264,19 @@ class assign_submission_onlineviva extends assign_submission_plugin
         if (!is_uploaded_file($filesrc)) {
             return false;
         }
+        if($this->count_files($submission->id,ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA)>=$chancelimit){
+            return false;
+        }
 
         $ext = "mp4";
 
-        $temp_name=basename($filename,".$ext"); // We want to clean the file's base name only
-        // Run param_clean here with PARAM_FILE so that we end up with a name that other parts of Moodle
-        // (download script, deletion, etc) will handle properly.  Remove leading/trailing dots too.
+        $temp_name=basename($filename,".$ext");
         $temp_name=trim(clean_param($temp_name, PARAM_FILE),".");
         $filename=$temp_name.".$ext";
-        // check for filename already existing and add suffix #.
         $n=1;
-        while($fs->file_exists($contextid, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, '/', $filename)) {
+        while($fs->file_exists($contextid, 'assignsubmission_onlineviva',
+            ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, '/', $filename))
+        {
             $filename=$temp_name.'_'.$n++.".$ext";
         }
         $author = $DB->get_record('user', array('id'=>$USER->id ), '*', MUST_EXIST);
@@ -290,9 +293,10 @@ class assign_submission_onlineviva extends assign_submission_plugin
 
         );
         if ($newfile = $fs->create_file_from_pathname($fileinfo, $filesrc)) {
-            $files = $fs->get_area_files($contextid, 'assignsubmission_onlineviva', ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, "id", false);
+            $files = $fs->get_area_files($contextid, 'assignsubmission_onlineviva',
+                ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA, $submission->id, "id", false);
             $count = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
-            //插入数据库记录,还没测试过
+           //add the submission record into the database tables
             if ($filesubmission) {
                 $filesubmission->videofile = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
                 return $DB->update_record('assignsubmission_onlineviva', $filesubmission);
@@ -342,7 +346,8 @@ class assign_submission_onlineviva extends assign_submission_plugin
     private function count_files($submissionid, $area) {
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_onlineviva', $area, $submissionid, "id", false);
+        $files = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_onlineviva',
+            $area, $submissionid, "id", false);
 
         return count($files);
     }

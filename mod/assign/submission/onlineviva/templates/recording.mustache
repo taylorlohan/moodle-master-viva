@@ -24,7 +24,7 @@
 </div>
 <div style="text-align: center;margin-top:20px;">
     <p>Questions for viva</p>
-    <table>
+    <table class="table table-striped">
         {{#questions}}
             <tr>
                 <td></td>
@@ -64,18 +64,18 @@
     let chosenquestion = document.querySelector('#test2').dataset.chosenquestion;
     let content=['test','test1','test2','test3'];
     let i=0;
-    /*let table = document.getElementsByTagName('table')[0],
-            rows = table.getElementsByTagName('tr');
-    for (let j=0, len = rows.length; j < len; j++) {
-        rows[j].children[0][text] = j;
-    }*/
 
     init();
     function init() {
         console.log('assignment is'+assignment);
         console.log('submission is'+submission);
         console.log('chosen total is '+chosenquestion);
-
+        let table = document.getElementsByTagName('table')[0],
+            rows = table.getElementsByTagName('tr'),
+                text = 'textContent' in document ? 'textContent' : 'innerText';
+        for (let j=0, len = rows.length; j < len; j++) {
+            rows[j].children[0][text] = j+1;
+        }
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -129,8 +129,6 @@
         }
         stopBtn.onclick = e => {
             recorder.stop();
-            /*audioTracks.stop();//没有用
-            videoTracks.stop();*/
             stream.getTracks().forEach( track => track.stop() );
             console.log('recorder has stopped')
             saveAudio();

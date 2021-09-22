@@ -56,5 +56,4 @@ $obj->questions=array_values($questionrecords);
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('assignsubmission_onlineviva/recording', $obj);
-//$PAGE->requires->js_call_amd('/mod/assign/submission/onlineviva/amd/src/functions.js','init', array($obj));
 echo $OUTPUT->footer();
