@@ -2,8 +2,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 define('ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA', 'submission_onlineviva');
-define('ASSIGN_SUBMISSION_ONLINEVIVA_MAX_SUMMARY_FILES', 25);//这里应该是configurable
-require_once($CFG->libdir . '/portfoliolib.php');
+define('ASSIGN_SUBMISSION_ONLINEVIVA_MAX_SUMMARY_FILES', 10);
 
 class assign_submission_onlineviva extends assign_submission_plugin
 {
@@ -358,7 +357,6 @@ class assign_submission_onlineviva extends assign_submission_plugin
     }
 
     public function format_for_log(stdClass $submission) {
-        // format the info for each submission plugin add_to_log
         $filecount = $this->count_files($submission->id, ASSIGN_FILEAREA_SUBMISSION_ONLINEVIVA);
         $fileloginfo = '';
         $fileloginfo .= ' the number of file(s) : ' . $filecount . " file(s).<br>";

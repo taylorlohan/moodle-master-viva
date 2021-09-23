@@ -21,8 +21,6 @@ global $USER, $DB, $CFG;
 
 $PAGE->set_url('/mod/assign/submission/onlineviva/recording.php');
 
-//$PAGE->set_context(context_module::instance());
-
 require_login();
 
 //$assignment=optional_param('assignment', '10', PARAM_INT);
@@ -41,6 +39,7 @@ function getValue($name, $assignmentid) {//get the specific value we want from t
     $current = $DB->get_record('assign_plugin_config', $dbparams, '*', IGNORE_MISSING);
     return $current->value;
 }
+$questions=array();
 
 $questions=array();
 

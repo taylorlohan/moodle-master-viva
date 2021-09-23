@@ -15,30 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Rates form
- *
- * @package    local_staffmanager
- * @copyright  2020 Ricoshae Pty Ltd
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 require_once("$CFG->libdir/formslib.php");
 
 class question_form extends moodleform
 {
-    //Add elements to form
     public function definition()
     {
         global $CFG;
 
-        $mform = $this->_form; // Don't forget the underscore!
+        $mform = $this->_form;
         $mform->addElement('html', '<strong>Question form</strong><br><br>');
 
 
-        $mform->addElement('text', 'content', 'content of a question', ' size="100%" '); // Add elements to your form
-        $mform->setType('content', PARAM_TEXT);                   //Set type of element
-        $mform->setDefault('content', '');        //Default value
+        $mform->addElement('text', 'content', 'content of a question', ' size="100%" ');
+        $mform->setType('content', PARAM_TEXT);
+        $mform->setDefault('content', '');
 
 
         $buttonarray=array();
@@ -47,7 +38,6 @@ class question_form extends moodleform
         $mform->addgroup($buttonarray, 'buttonar', '', ' ', false);
 
     }
-    //Custom validation should be added here
     public function validation($data, $files)
     {
         return array();

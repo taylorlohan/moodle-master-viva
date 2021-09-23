@@ -15,6 +15,6 @@ $assignmentid= optional_param('assignmentid', '', PARAM_INT);
 $dbparams = array('id'=>$id,
 );
 if($DB->delete_records('onlineviva_questions', $dbparams))
-    redirect("/moodle-master/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", 'Question deleted!', 10,  \core\output\notification::NOTIFY_SUCCESS);
+    redirect($CFG->wwwroot ."/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", 'Question deleted!', 10,  \core\output\notification::NOTIFY_SUCCESS);
 
 

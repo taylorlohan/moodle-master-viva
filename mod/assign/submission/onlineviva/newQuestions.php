@@ -21,7 +21,6 @@ global $USER, $DB, $CFG;
 require_once("forms/question_form.php");
 
 $PAGE->set_url('/mod/assign/submission/onlineviva/newQuestions.php');
-//$PAGE->set_context(context_system::instance());
 require_login();
 
 $strpagetitle = get_string('onlineviva', 'assignsubmission_onlineviva');
@@ -52,7 +51,6 @@ if ($mform->is_cancelled()) {
         $obj = $DB->get_record('onlineviva_questions', ['id'=>$id]);
         $obj->id=$id;
         $obj->content = $fromform->content;
-        $obj->qorder=$fromform->qorder;
         $obj->assignment=$fromform->assignment;
 
         $str=$DB->update_record('onlineviva_questions', $obj);
@@ -63,7 +61,6 @@ if ($mform->is_cancelled()) {
         $count=$DB->count_records('onlineviva_questions',['assignment'=>$assignmentid]);
         if ($count<$maxquestion){
             $obj = new stdClass();
-            $obj->qorder=$count+1;
             $obj->assignment=$assignmentid;
             $obj->content = $fromform->content;
             $orgid = $DB->insert_record('onlineviva_questions', $obj, true, false);
@@ -78,7 +75,7 @@ if ($mform->is_cancelled()) {
         \core\notification::add('missing assignmentid or question id', \core\output\notification::NOTIFY_WARNING);
     }*/
     // redirect to units page with qual id
-    redirect("/moodle-master/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", 'Changes saved', 10,  \core\output\notification::NOTIFY_SUCCESS);
+    redirect($CFG->wwwroot ."/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", 'Changes saved', 10,  \core\output\notification::NOTIFY_SUCCESS);
 } else {
     //this branch is working when the form is not cancelled or submitted, which means editing the question form
     if ($id) {

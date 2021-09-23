@@ -35,12 +35,6 @@
             <div class="card-body"><p>There are no results.</p></div>
         {{/questions}}
     </table>
-    <!--
-
-    <button id="skipBtn" >next question</button>-->
-    <!--
-    <p><input type="radio" name="format" value="video/webm;codecs=vp8" onclick="setFormatSelect('video/webm;codecs=vp8')">video/webm;codecs=vp8</p>
-     -->
 </div>
 
 <div
@@ -123,7 +117,6 @@
         startBtn.onclick = e => {
             recorder.start(10);
             timedCount();
-            skipQuestion();
             startBtn.disabled = true;
             stopBtn.disabled = false;
         }
@@ -132,15 +125,9 @@
             stream.getTracks().forEach( track => track.stop() );
             console.log('recorder has stopped')
             saveAudio();
-            //blobDownload(format);
             startBtn.disabled = false;
             stopBtn.disabled = true;
         }
-
-        /*skipBtn.onclick = e => {
-            i++;
-            skipQuestion();
-        }*/
         recorder.onstop=event => {
             allChunks.push(
                     e.data
@@ -159,20 +146,6 @@
             return;
         }
     }
-/*
-    function skipQuestion() {
-
-        if(i<chosenquestion){
-            rows[i].show();
-            //document.querySelector("#questions").innerHTML = 'question' +(i+1)+'.'+ rows[i];
-        }
-        else{
-            rows[i].children[1][innerText] = 'no questions to anwser!';
-            //document.querySelector(".questions").innerHTML = 'no questions to anwser!';
-        }
-
-    }
-*/
     function saveAudio() {
         const fullBlob = new Blob(allChunks, { type: 'video/mp4' });
         const uploadUrl = window.URL.createObjectURL(fullBlob);
