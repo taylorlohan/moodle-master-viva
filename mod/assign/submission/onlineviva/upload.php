@@ -24,6 +24,8 @@ $submission_plugin = $newassignment->get_submission_plugin_by_type('onlineviva')
 $submission = $newassignment->get_user_submission($USER->id, true);
 if($submission_plugin->add_recording($video,$submission)) {
     echo 'uploaded success!';
+    echo 'context id is '.$contextid;
 } else {
     echo 'uploaded fail';
+    echo 'context id is '.$contextid;
 }
