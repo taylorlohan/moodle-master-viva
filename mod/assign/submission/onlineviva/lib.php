@@ -15,13 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This file contains the moodle hooks for the online audio recording submission plugin
- *
- * @package assignsubmission_onlineviva
- * @copyright 2012 Paul Nicholls
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 defined('MOODLE_INTERNAL') || die();
 
 /**

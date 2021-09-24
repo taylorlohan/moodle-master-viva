@@ -46,17 +46,18 @@
 <div
         id="test2"
         data-chosenquestion={{chosenquestion}}> </div>
-
+<div
+        id="test3"
+        data-timelimit={{timelimit}}> </div>
 
 
 
 <script>
     var allChunks = [];
-    let c=10;
+    let c=document.querySelector('#test3').dataset.timelimit;
     let assignment = document.querySelector('#test').dataset.assignment;
     let submission = document.querySelector('#test1').dataset.submission;
     let chosenquestion = document.querySelector('#test2').dataset.chosenquestion;
-    let content=['test','test1','test2','test3'];
     let i=0;
 
     init();
@@ -95,15 +96,15 @@
     function setFormatSelect(format){
         if(!MediaRecorder.isTypeSupported(format)){
             alert(format)
-            alert("当前浏览器不支持该编码类型");
+            alert("unsupported type!");
             return;
         }
         allChunks = [];
         setRecorder(format)
     }
     function setRecorder(format) {
-        const stream = canvas.captureStream(60); // 60 FPS recording
-        const audioTracks = stream.getAudioTracks();//怎么只得到音频
+        const stream = canvas.captureStream(60);
+        const audioTracks = stream.getAudioTracks();
         const videoTracks=stream.getVideoTracks();
         const recorder = new MediaRecorder(stream, {
             mimeType: format
@@ -135,14 +136,13 @@
         }
     }
     function timedCount() {
-        document.querySelector(".count").innerHTML = 'time left is' + c;
+        document.querySelector(".count").innerHTML = 'time left is' + c+' s';
         c = c - 1;
         if (c > 0) {
             let t = setTimeout(timedCount, 1000);
         } else {
             document.querySelector(".count").innerHTML = "Time is up!";
             stopBtn.click()
-            console.log('stop is clicked')
             return;
         }
     }
@@ -163,7 +163,7 @@
             cache: false,
             success: function(data)
             {
-                alert("pass data to php success!");
+                alert("You have uploaded a recording successfully! You may now close this page. ");
                 console.log(data);
             }
         });

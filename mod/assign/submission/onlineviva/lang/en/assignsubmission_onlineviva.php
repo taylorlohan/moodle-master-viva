@@ -10,6 +10,8 @@
 $string['onlineviva']='online viva';
 $string['default_help']='this plugin helps you to do the online viva';
 $string['default'] = 'default setting';
+$string['enabled'] = 'Online viva';
+$string['enabled_help'] = 'If enabled, students are able to upload an online recording for their submission.';
 $string['timelimit']='Recording time';
 $string['chancelimit']='Attempt chance limit';
 $string['maxquestion']='questions in total';

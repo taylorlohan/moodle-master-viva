@@ -7,10 +7,7 @@ define('ASSIGN_SUBMISSION_ONLINEVIVA_MAX_SUMMARY_FILES', 10);
 class assign_submission_onlineviva extends assign_submission_plugin
 {
 
-    /**
-     * Get the name of the online text submission plugin
-     * @return string
-     */
+
     public function get_name()
     {
         return get_string('onlineviva', 'assignsubmission_onlineviva');

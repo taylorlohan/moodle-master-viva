@@ -38,8 +38,6 @@ $chosenquestion=getValue('chosenquestion',$assignmentid);
 $mform = new question_form();
 $toform = [];
 
-// if no org ID then it is a new org
-// if there is an orgid the we show the edit for with save
 $mform = new question_form("?assignmentid=$assignmentid");
 $toform = [];
 //Form processing and displaying is done here
@@ -71,9 +69,7 @@ if ($mform->is_cancelled()) {
         }
 
     }
-    /*else {
-        \core\notification::add('missing assignmentid or question id', \core\output\notification::NOTIFY_WARNING);
-    }*/
+
     // redirect to units page with qual id
     redirect($CFG->wwwroot ."/mod/assign/submission/onlineviva/addQuestions.php?assignmentid=$assignmentid", 'Changes saved', 10,  \core\output\notification::NOTIFY_SUCCESS);
 } else {

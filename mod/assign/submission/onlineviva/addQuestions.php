@@ -4,7 +4,6 @@ global $USER,$CFG,$DB;
 
 $PAGE->set_url('/mod/assign/submission/onlineviva/addQuestions.php');
 require_login();
-
 $assignmentid=optional_param('assignmentid', 3,PARAM_INT);
 
 $dbparams = array('assignment'=>$assignmentid);
